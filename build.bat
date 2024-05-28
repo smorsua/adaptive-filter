@@ -1,0 +1,1 @@
+iverilog -g 2012 -d scope -o main ./design/transposed_fir.sv ./tests/transposed_fir_tb.sv
