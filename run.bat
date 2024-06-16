@@ -1,1 +1,1 @@
-vvp main -fst +coeffs="./matlab/coeffs_8.fcf"
+vvp main -fst +coeffs="./matlab/coeffs_8_pass.fcf"

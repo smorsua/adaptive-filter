@@ -1,0 +1,1 @@
+python3 ./scripts/gen_input.py -b 15 -f 10 -s 1000 -fs 1000

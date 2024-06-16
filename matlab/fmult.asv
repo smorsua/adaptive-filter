@@ -1,0 +1,21 @@
+signed = 1;
+word_len = 16;
+frac_len = 15;
+T = numerictype(signed, word_len, frac_len);
+q = quantizer('DataMode', 'fixed', 'RoundMode', 'floor', 'Format', [word_len frac_len], 'OverflowMode', 'wrap');
+vec_len = 100;
+
+
+% mult1 = randquant(q, vec_len, 1);
+% mult2 = randquant(q, vec_len, 1);
+mult1 = fi(mult1, T);
+mult2 = fi(mult2, T);
+result = fi(mult1.*mult2, T);
+
+mult1 = fi(mult1, T);
+mult2 = fi(mult2, T);
+result = fi(result, T);
+
+% fvector = fopen("test_vector.txt", "w");
+% fprintf(fvector, "%s %s %s\n", string(mult1.bin), string(mult2.bin), string(result.bin));
+% fclose(fvector);

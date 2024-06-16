@@ -1,8 +1,9 @@
 %% Generate input
-t = 1:0.01:10;
-f = 10;
-range_max = 2^15-1; 
-in = range_max * 0.1 * sin(2*pi*f*t);
+t = 0:0.01:10;
+T = 1;
+bits = 16;
+range_max = 2^(bits-1)-1; 
+in = range_max * sin(2*pi/T*t);
 in = floor(in);
 fid = fopen("input.txt", "w");
 fprintf(fid, "%d\n", in);

@@ -1,6 +1,6 @@
 module transposed_fir_tb();
     localparam DIN_WIDTH = 16;
-    localparam DOUT_WIDTH = 32;
+    localparam DOUT_WIDTH = 16;
     localparam TAPS = 8;
 
     reg clk;
@@ -59,13 +59,15 @@ module transposed_fir_tb();
         fin = $fopen("./matlab/input.txt", "r");
         fout = $fopen("./output.txt", "w");
         fork
-            for(integer i = 0; i < 901; i++) begin
+            // Input signal
+            for(integer i = 0; i < 1000; i++) begin
                 reg [DIN_WIDTH-1:0] sample;
                 $fscanf(fin, "%d", sample);
                 next_sample(sample);
             end
 
-            for(integer i = 0; i < 901; i++) begin
+            // Monitor
+            for(integer i = 0; i < 1000; i++) begin
                 @(posedge clk);
                 $fwrite(fout, $sformatf("%0d\n", $signed(dout)));
             end

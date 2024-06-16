@@ -1,6 +1,7 @@
 module adaptive_filter #(
-    parameter WIDTH = 16,
-    parameter TAPS = 16
+    parameter WIDTH,
+    parameter FRAC,
+    parameter TAPS
 ) (
     input clk,
     input rstn,
@@ -12,7 +13,17 @@ module adaptive_filter #(
     output reg [TAPS-1:0][WIDTH-1:0] weights
 );
 
-    reg [TAPS-1:0][WIDTH-1:0] next_weights;
+    wire [TAPS-1:0][WIDTH-1:0] next_weights;
+    wire [TAPS-1:0][WIDTH-1:0] din_tapped_delay;
+
+    // Update weights 
+    always @(posedge clk or rstn) begin
+        if(!rstn) begin
+            weights <= 0;
+        end else begin
+            weights <= next_weights;
+        end
+    end
 
     tapped_delay_line #(
         .WIDTH(WIDTH),
@@ -21,12 +32,12 @@ module adaptive_filter #(
         .clk(clk),
         .rstn(rstn),
         .din(din),
-        .tapped_delay()
+        .tapped_delay(din_tapped_delay)
     );
 
     transposed_fir #(
-        .DIN_WIDTH(DIN_WIDTH),
-        .DOUT_WIDTH(DOUT_WIDTH),
+        .WIDTH(WIDTH),
+        .FRAC(FRAC),
         .TAPS(TAPS)
     ) filter (
         .clk(clk),
@@ -40,9 +51,12 @@ module adaptive_filter #(
 
     lms #(
         .WIDTH(WIDTH),
+        .FRAC(FRAC),
+        .COEFF_WIDTH(WIDTH),
+        .COEFF_FRAC(FRAC),
         .TAPS(TAPS)
     ) my_lms (
-        .din(tapped_delay),
+        .din(din_tapped_delay),
         .error(error),
         .step_size(step_size),
         .curr_weights(weights),
