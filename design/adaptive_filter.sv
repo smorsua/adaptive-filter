@@ -5,12 +5,12 @@ module adaptive_filter #(
 ) (
     input clk,
     input rstn,
-    input [WIDTH-1:0] din,
-    input [WIDTH-1:0] desired,
+    input signed [WIDTH-1:0] din,
+    input signed [WIDTH-1:0] desired,
     input [WIDTH-1:0] step_size,
-    output [WIDTH-1:0] dout,
-    output [WIDTH-1:0] error,
-    output reg [TAPS-1:0][WIDTH-1:0] weights
+    output signed [WIDTH-1:0] dout,
+    output signed [WIDTH-1:0] error,
+    output reg signed [TAPS-1:0][WIDTH-1:0] weights
 );
 
     wire [TAPS-1:0][WIDTH-1:0] next_weights;
@@ -52,15 +52,14 @@ module adaptive_filter #(
     lms #(
         .WIDTH(WIDTH),
         .FRAC(FRAC),
-        .COEFF_WIDTH(WIDTH),
-        .COEFF_FRAC(FRAC),
         .TAPS(TAPS)
     ) my_lms (
         .din(din_tapped_delay),
         .error(error),
         .step_size(step_size),
         .curr_weights(weights),
-        .next_weights(next_weights)
+        .next_weights(next_weights),
+        .next_weights_ovr()
     );
 
 endmodule

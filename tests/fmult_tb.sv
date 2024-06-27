@@ -24,7 +24,7 @@ module fmult_tb();
 
     initial begin
         // Load input vector
-        static int fvector = $fopen("..\\matlab\\test_vector.txt", "r");
+        static int fvector = $fopen("../matlab/data/test_vector.txt", "r");
         int code;
         
         bit [WIDTH-1:0] a[$], b[$], res[$];
@@ -36,7 +36,7 @@ module fmult_tb();
         end
 
         while(1) begin
-            code = $fscanf(fvector, "%b %b %b", a_temp, b_temp, res_temp);
+            code = $fscanf(fvector, "%d %d %d", a_temp, b_temp, res_temp);
             if(code == 0 || code == -1) begin
                 break;    
             end
@@ -47,6 +47,8 @@ module fmult_tb();
         end
 
         $fclose(fvector);
+        
+        i_ovr = 0;
 
         for(int i = 0; i < a.size(); i++) begin
             i_multiplicand = a[i];

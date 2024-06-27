@@ -1,17 +1,17 @@
 module transposed_fir_tb();
-    localparam DIN_WIDTH = 16;
-    localparam DOUT_WIDTH = 16;
-    localparam TAPS = 8;
+    localparam WIDTH = 16;
+    localparam FRAC = 7;
+    localparam TAPS = 4;
 
     reg clk;
     reg rstn;
-    reg [DIN_WIDTH-1:0] din;
-    reg [TAPS-1:0][DIN_WIDTH-1:0] coeffs;
-    wire [DOUT_WIDTH-1:0] dout;
+    reg [WIDTH-1:0] din;
+    reg [TAPS-1:0][WIDTH-1:0] coeffs;
+    wire [WIDTH-1:0] dout;
 
     transposed_fir #(
-        .DIN_WIDTH(DIN_WIDTH),
-        .DOUT_WIDTH(DOUT_WIDTH),
+        .WIDTH(WIDTH),
+        .FRAC(FRAC),
         .TAPS(TAPS)
     ) my_fir(
         .clk(clk),
@@ -20,12 +20,6 @@ module transposed_fir_tb();
         .coeffs(coeffs),
         .dout(dout)
     );
-
-    // Dump waves
-    initial begin
-        $dumpfile("dump.fst");
-        $dumpvars();
-    end
 
     // Clock
     initial begin
@@ -42,38 +36,40 @@ module transposed_fir_tb();
         rstn = 1;
         din = 0;
 
-        $value$plusargs("coeffs=%s", coeff_file);
+        // void'($value$plusargs("coeffs=%s", coeff_file));
+        coeff_file = "../matlab/data/coeffs.txt";
         fcoeff = $fopen(coeff_file, "r");
         for(integer i = 0; i < TAPS; i++) begin
-            reg [DIN_WIDTH-1:0] coeff;
-            $fscanf(fcoeff, "%x", coeff);
+            reg [WIDTH-1:0] coeff;
+            void'($fscanf(fcoeff, "%d", coeff));
             coeffs[i] = coeff; 
         end
 
         for(integer i = 0; i < TAPS; i++) begin
-            $display("%x", coeffs[i]);    
+            $display("%d", coeffs[i]);    
         end
 
         reset_fir();
 
-        fin = $fopen("./matlab/input.txt", "r");
-        fout = $fopen("./output.txt", "w");
+        fin = $fopen("../matlab/data/input.txt", "r");
+        fout = $fopen("../matlab/data/output.txt", "w");
+        
         fork
             // Input signal
-            for(integer i = 0; i < 1000; i++) begin
-                reg [DIN_WIDTH-1:0] sample;
-                $fscanf(fin, "%d", sample);
+            for(integer i = 0; i < 2000; i++) begin
+                reg [WIDTH-1:0] sample;
+                void'($fscanf(fin, "%d", sample));
                 next_sample(sample);
             end
 
             // Monitor
-            for(integer i = 0; i < 1000; i++) begin
+            for(integer i = 0; i < 2000; i++) begin
                 @(posedge clk);
                 $fwrite(fout, $sformatf("%0d\n", $signed(dout)));
             end
         join
 
-        $finish();
+        $stop();
     end
 
     task reset_fir();
@@ -84,7 +80,7 @@ module transposed_fir_tb();
         end
     endtask
 
-    task next_sample(input [DIN_WIDTH-1:0] data_in);
+    task next_sample(input [WIDTH-1:0] data_in);
         begin 
             din = data_in;
             @(posedge clk);
