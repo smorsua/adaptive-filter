@@ -48,8 +48,8 @@ virtual class load_file #(parameter WIDTH, parameter TAPS=1);
 endclass
 
 module lms_tb;
-    localparam WIDTH = 16;
-    localparam FRAC = 7;
+    localparam WIDTH = 32;
+    localparam FRAC = 25;
     localparam TAPS = 2;
 
     reg [TAPS-1:0][WIDTH-1:0] din;

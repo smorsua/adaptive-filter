@@ -8,24 +8,27 @@ ns = 2000;
 rng(0);
 x = fi(randquant(q, ns, 1), T);
 
-T2 = numerictype(1, 50, 21);
-taps = 5;
-
+taps = 4;
 coeffs = [1 2 3 4];
+
 coeffs = fi(coeffs, T);
-sums = fi(zeros(taps-1,1), T2);
+mults = fi(zeros(ns,taps), T);
+delay_line = fi(zeros(ns, taps-1), T);
 y = fi(zeros(length(x),1), T);
 
-for i = 1:length(x)
-    sample = x(i);
-    mults = sample.*fi(coeffs, T2);
+for i=2:ns
+    for j=length(delay_line(i,:)):-1:2
+        delay_line(i,j) = delay_line(i-1,j-1);
+    end
+    delay_line(i,1) = x(i-1);
 
-    for j = length(sums):-1:2
-        sums(j) = sums(j-1) + mults(j);
+    for j=2:length(mults(i,:))
+        mults(i,j) = quantize(delay_line(i-1,j-1) * coeffs(j), T, 'Floor', 'Wrap');
     end
 
-    sums(1) = mults(1);
-    y(i) = quantize(sums(end) + mults(end), T, 'Floor', 'Wrap');
+    mults(i,1) = quantize(x(i-1)*coeffs(1), T, 'Floor', 'Wrap');
+
+    y(i) = quantize(sum(mults(i,:)), T, 'Floor', 'Wrap');
 end
 
 save_dec_txt(x, T, "data/input.txt");

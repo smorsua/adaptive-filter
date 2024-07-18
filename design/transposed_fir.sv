@@ -9,7 +9,9 @@ module transposed_fir #(
     input rstn,
     input [WIDTH-1:0] din,
     input [TAPS-1:0][WIDTH-1:0] coeffs,
-    output reg [WIDTH-1:0] dout
+    input i_ovr,
+    output reg [WIDTH-1:0] dout,
+    output o_ovr
 );
 
     localparam CALC_WIDTH = WIDTH + WIDTH + TAPS-1;
@@ -18,6 +20,8 @@ module transposed_fir #(
     reg [TAPS-1:0][CALC_WIDTH-1:0] mult_res;
     reg [TAPS-2:0][CALC_WIDTH-1:0] partial_sums; // One delay less than taps
     wire [CALC_WIDTH-1:0] dout_fw;
+
+    wire [TAPS-1:0] mult_ovr;
     generate
         // Multiply coeffs by input sample
         for(genvar i = 0; i < TAPS; i++) begin
@@ -30,8 +34,8 @@ module transposed_fir #(
                 .i_multiplicand(din),
                 .i_multiplier(coeffs[TAPS-1-i]), // Coeffs are reversed in transposed FIR 
                 .o_result(mult_res[i]),
-                .i_ovr(),
-                .o_ovr()
+                .i_ovr(i_ovr),
+                .o_ovr(mult_ovr[i])
             );
         end
 
@@ -39,7 +43,7 @@ module transposed_fir #(
         for(genvar i = TAPS-2; i >= 1; i--) begin
             always @(posedge clk or negedge rstn) begin
                 if(rstn) begin // Not a reset
-                    partial_sums[i] <= mult_res[i] + partial_sums[i-1];
+                    partial_sums[i] <= mult_res[i] + partial_sums[i-1]; // FIXME: take sum ovr into account
                 end
             end
         end
@@ -57,6 +61,7 @@ module transposed_fir #(
 
     assign dout_fw = mult_res[TAPS-1] + partial_sums[TAPS-2];
 
+    wire dout_ovr;
     fixed_point_converter #(
         .DIN_WIDTH(CALC_WIDTH),
         .DIN_FRAC(CALC_FRAC),
@@ -64,9 +69,11 @@ module transposed_fir #(
         .DOUT_FRAC(FRAC)
     ) dout_conv (
         .din(dout_fw),
-        .i_ovr(),
+        .i_ovr(|(mult_ovr)),
         .dout(dout),
-        .o_ovr()
+        .o_ovr(dout_ovr)
     );
+
+    assign o_ovr = i_ovr | dout_ovr;
 
 endmodule

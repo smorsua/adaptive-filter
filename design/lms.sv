@@ -7,6 +7,7 @@ module lms #(
     input signed [WIDTH-1:0] error,
     input signed [WIDTH-1:0] step_size,
     input signed [TAPS-1:0][WIDTH-1:0] curr_weights,
+    input i_ovr,
     output signed [TAPS-1:0][WIDTH-1:0] next_weights,
     output signed [TAPS-1:0] next_weights_ovr
 );
@@ -43,7 +44,7 @@ module lms #(
                 .i_multiplicand(error),
                 .i_multiplier(din[i]),
                 .o_result(error_times_din_res),
-                .i_ovr(1'b0),
+                .i_ovr(i_ovr),
                 .o_ovr(error_times_din_res_ovr)
             );
 

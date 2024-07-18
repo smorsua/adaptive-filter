@@ -1,6 +1,6 @@
-module transposed_fir_tb();
-    localparam WIDTH = 16;
-    localparam FRAC = 7;
+module direct_fir_tb();
+    localparam WIDTH = 32;
+    localparam FRAC = 25;
     localparam TAPS = 4;
 
     reg clk;
@@ -9,22 +9,19 @@ module transposed_fir_tb();
     reg [TAPS-1:0][WIDTH-1:0] coeffs;
     wire [WIDTH-1:0] dout;
 
-    transposed_fir #(
+    direct_fir #(
         .WIDTH(WIDTH),
         .FRAC(FRAC),
         .TAPS(TAPS)
     ) my_fir(
-        .clk(clk),
-        .rstn(rstn),
-        .din(din),
-        .coeffs(coeffs),
-        .dout(dout)
+        .i_clk(clk),
+        .i_rstn(rstn),
+        .i_din(din),
+        .i_coeffs(coeffs),
+        .i_ovr(1'b0),
+        .o_dout(dout),
+        .o_ovr()
     );
-
-    initial begin
-        $dumpfile("test.vcd");
-        $dumpvars();
-    end
 
     // Clock
     initial begin
@@ -41,7 +38,6 @@ module transposed_fir_tb();
         rstn = 1;
         din = 0;
 
-        // void'($value$plusargs("coeffs=%s", coeff_file));
         coeff_file = "../matlab/data/coeffs.txt";
         fcoeff = $fopen(coeff_file, "r");
         for(integer i = 0; i < TAPS; i++) begin
@@ -70,7 +66,7 @@ module transposed_fir_tb();
             // Monitor
             for(integer i = 0; i < 2000; i++) begin
                 @(posedge clk);
-                $fwrite(fout, $sformatf("%0d\n", $signed(dout)));
+                $fdisplay(fout, "%0d", $signed(dout));
             end
         join
 

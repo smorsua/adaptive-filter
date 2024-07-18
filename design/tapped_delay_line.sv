@@ -12,7 +12,7 @@ module tapped_delay_line #(
             tapped_delay <= 0;
         else begin
             // Update in reverse to avoid overwriting values
-            for(integer i = DEPTH-1; i >= 0; i--) begin
+            for(int i = DEPTH-1; i > 0; i--) begin
                 tapped_delay[i] <= tapped_delay[i-1];
             end
             tapped_delay[0] <= din;

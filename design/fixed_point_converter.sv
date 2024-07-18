@@ -11,7 +11,7 @@ module fixed_point_converter #(
 ) (
     input [DIN_WIDTH-1:0] din,
     input i_ovr,
-    output [DOUT_WIDTH-1:0] dout,
+    output reg [DOUT_WIDTH-1:0] dout,
     output o_ovr
 );
     localparam din_frac_end = DIN_FRAC - 1;     
@@ -25,25 +25,27 @@ module fixed_point_converter #(
     localparam dout_integer_start = dout_integer_end - dout_integer + 1;
     localparam din_integer_end = DIN_WIDTH - 1;
     localparam din_integer_start = din_integer_end - din_integer + 1;
-
-    generate
         
     // Convert fractional part if present in both source and destination
     if(DIN_FRAC > 0 && DOUT_FRAC > 0) begin
         if(DIN_FRAC < DOUT_FRAC) begin
             assign dout[dout_frac_end:dout_frac_end-DIN_FRAC+1] = din[din_frac_end:0];
-        end else begin
+            assign dout[dout_frac_end-DIN_FRAC:0] = 0;
+        end else if (DIN_FRAC > DOUT_FRAC) begin
             assign dout[dout_frac_end:0] = din[din_frac_end:din_frac_end-DOUT_FRAC+1];
+        end else begin
+            assign dout[dout_frac_end:0] = din[din_frac_end:0];
         end
     end
 
     // Convert integer part. There is always at least one bit (sign)
     if(din_integer < dout_integer) begin
         assign dout[dout_integer_end:dout_integer_start] = $signed(din[din_integer_end:din_integer_start]); // Automatic sign extension
-    end else begin
+    end else if(din_integer > dout_integer) begin
         assign dout[dout_integer_end:dout_integer_start] = $signed(din[din_integer_start + dout_integer - 1:din_integer_start]); // We don't subtract 1 on the MSB of din because we use the additional bit as the sign bit.
+    end else begin
+        assign dout[dout_integer_end:dout_integer_start] = $signed(din[din_integer_end:din_integer_start]);
     end
-    endgenerate
 
     assign o_ovr = (dout[DOUT_WIDTH-1] != din[DIN_WIDTH-1]) | i_ovr; // Overflow if sign isn't equal
 endmodule
