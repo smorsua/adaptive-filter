@@ -1,7 +1,7 @@
 module adaptive_filter #(
-    parameter WIDTH,
-    parameter FRAC,
-    parameter TAPS
+    parameter WIDTH=32,
+    parameter FRAC=20,
+    parameter TAPS=2
 ) (
     input clk,
     input rstn,
