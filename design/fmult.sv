@@ -1,9 +1,9 @@
 
 module fmult #(
-    parameter DIN_WIDTH,
-    parameter DIN_FRAC,
-    parameter DOUT_WIDTH,
-    parameter DOUT_FRAC
+    parameter DIN_WIDTH=16,
+    parameter DIN_FRAC=15,
+    parameter DOUT_WIDTH=16,
+    parameter DOUT_FRAC=15
 ) (
     input signed [DIN_WIDTH-1:0] i_multiplicand,
     input signed [DIN_WIDTH-1:0] i_multiplier,

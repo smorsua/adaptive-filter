@@ -1,0 +1,7 @@
+xmsim: 21.09-s009: (c) Copyright 1995-2022 Cadence Design Systems, Inc.
+TOOL:	xmsim	21.09-s009: Started on Jul 18, 2024 at 13:33:17 EDT
+xmsim
+    -MESSAGES
+
+xmsim: *F,MISSIM: Missing simulation name.
+TOOL:	xmsim	21.09-s009: Exiting on Jul 18, 2024 at 13:33:17 EDT  (total: 00:00:00)

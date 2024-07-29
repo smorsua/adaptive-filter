@@ -1,9 +1,7 @@
-`include "./fixed_point_converter.sv"
-
 module transposed_fir #(
-    parameter WIDTH,
-    parameter FRAC,
-    parameter TAPS
+    parameter WIDTH=16,
+    parameter FRAC=15,
+    parameter TAPS=2
 ) (
     input clk,
     input rstn,

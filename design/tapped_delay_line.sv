@@ -1,6 +1,6 @@
 module tapped_delay_line #(
-    parameter WIDTH,
-    parameter DEPTH
+    parameter WIDTH=16,
+    parameter DEPTH=2
 ) (
     input clk,
     input rstn,

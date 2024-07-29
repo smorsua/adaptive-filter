@@ -1,7 +1,7 @@
 module lms #(
-    parameter WIDTH, // Used for all net but weights
-    parameter FRAC, // Used for all net but weights
-    parameter TAPS
+    parameter WIDTH = 16,
+    parameter FRAC = 15,
+    parameter TAPS=2
 ) (
     input signed [TAPS-1:0][WIDTH-1:0] din,
     input signed [WIDTH-1:0] error,

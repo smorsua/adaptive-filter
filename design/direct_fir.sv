@@ -1,7 +1,7 @@
 module direct_fir #(
-    parameter WIDTH,
-    parameter FRAC,
-    parameter TAPS
+    parameter WIDTH=16,
+    parameter FRAC=15,
+    parameter TAPS=2
 ) (
     input i_clk,
     input i_rstn,

@@ -1,6 +1,6 @@
 module fadd #(
-    parameter WIDTH,
-    parameter FRAC
+    parameter WIDTH=16,
+    parameter FRAC=15
 ) (
     input [WIDTH-1:0] i_a,
     input [WIDTH-1:0] i_b,
