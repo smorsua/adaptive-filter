@@ -1,12 +1,13 @@
 proc hdlsimulink {args} {
 set ::env(LD_PRELOAD) /cad/adi/apps/mathworks/matlab/2022b_u2/sys/os/glnxa64/libstdc++.so.6
   lappend sllibarg -64bit -loadvpi \{/cad/adi/apps/mathworks/matlab/2022b_u2/toolbox/edalink/extensions/incisive/linux64/liblfihdls_tmwgcc.so:simlinkserver\}
-  set socket 35463
   if {[catch {lsearch -exact $args -socket} idx]==0  && $idx >= 0} {
     set socket [lindex $args [expr {$idx + 1}]]
     set args [lreplace $args $idx [expr {$idx + 1}]]
+    append socketarg "+socket=" "$socket"
+    lappend sllibarg $socketarg
   }
-  set runmode "Batch with Xterm"
+  set runmode "GUI"
   if {$runmode == "Batch" || $runmode == "Batch with Xterm"} {
     lappend sllibarg " +batch"
     set runopt "-Batch -EXIT"
@@ -15,8 +16,6 @@ set ::env(LD_PRELOAD) /cad/adi/apps/mathworks/matlab/2022b_u2/sys/os/glnxa64/lib
   } else {
     set runopt "-gui"
   } 
-  append socketarg "+socket=" "$socket"
-  lappend sllibarg $socketarg
   lappend sllibarg 
   set args [linsert $args 0 exec <@stdin >@stdout  xmsim $runopt]
   lappend args [join $sllibarg]
@@ -29,7 +28,7 @@ set ::env(LD_PRELOAD) /cad/adi/apps/mathworks/matlab/2022b_u2/sys/os/glnxa64/lib
   lappend mlinput  -input "{@proc nomatlabtb {args} {call nomatlabtb \$args}}" -input "{@proc matlabtb {args} {call matlabtb \$args}}" -input "{@proc matlabcp {args} {call matlabcp \$args}}" -input "{@proc matlabtbeval {args} {call matlabtbeval \$args}}" -input "{@proc notifyMatlabServer {args} {call notifyMatlabServer \$args}}"
   lappend mlinput [join $args]
   lappend mlinput [join $mllibarg]
-  set runmode "Batch with Xterm"
+  set runmode "GUI"
   if {$runmode == "Batch" || $runmode == "Batch with Xterm"} {
     set runopt "-Batch -EXIT"
   } elseif {$runmode == "CLI"} {
@@ -49,7 +48,7 @@ set ::env(LD_PRELOAD) /cad/adi/apps/mathworks/matlab/2022b_u2/sys/os/glnxa64/lib
     append socketarg "+socket=" "$socket"
     lappend sllibarg $socketarg
   }
-  set runmode "Batch with Xterm"
+  set runmode "GUI"
   if {$runmode == "Batch" || $runmode == "Batch with Xterm"} {
     lappend sllibarg " +batch"
     set runopt "-Batch -EXIT"
@@ -63,9 +62,6 @@ set ::env(LD_PRELOAD) /cad/adi/apps/mathworks/matlab/2022b_u2/sys/os/glnxa64/lib
   lappend args [join $sllibarg]
   uplevel 1 [join $args]
 }
-if { [catch {hdlsimulink -log xmsim.log  -64bit  adaptive_filter -input "exit"} errmsg] } {
-    set fid [ open tp88bde992_1f40_4d40_a5f8_d8e455713574.log w];
-    puts $fid "Loading simulation and HDL Verifier library failed.";
-    puts $fid $errmsg;
-    close $fid;
-}
+exec xmelab  -64bit -access +wc  -File parameter_adaptive_filter.cfg adaptive_filter
+hdlsimmatlabsysobj adaptive_filter  -64bit  -socket 36549 -input "{@simvision {set w \[waveform new\]}}" -input "{@simvision {waveform add -using \$w -signals adaptive_filter}}" -input "{@probe -create -shm adaptive_filter}" -input "{@database -open waves -into waves.shm -default}"
+

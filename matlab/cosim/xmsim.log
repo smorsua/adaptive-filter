@@ -1,8 +1,15 @@
 xmsim(64): 21.09-s009: (c) Copyright 1995-2022 Cadence Design Systems, Inc.
+xmsim: *W,NOMTDGUI: Multi-Threaded Dumping is disabled for interactive debug mode.
 xmsim: *W,DSEM2009: This SystemVerilog design is simulated as per IEEE 1800-2009 SystemVerilog simulation semantics. Use -disable_sem2009 option for turning off SV 2009 simulation semantics.
-************************************************************************
-HDL server has been started in batch mode. The HDL simulator will be 
-blocked until Simulink starts cosimulation. If you do not want to run
-in batch mode, restart the HDL simulator in a different run mode. To 
-exit the HDL simulator without running a cosimulation session, issue 
-the breakHdlSim('35463') command in MATLAB.
+
+-------------------------------------
+Relinquished control to SimVision...
+xcelium> 
+xcelium> simvision {set w [waveform new]}
+xcelium> simvision {waveform add -using $w -signals adaptive_filter}
+xcelium> probe -create -shm adaptive_filter
+Created default SHM database xcelium.shm
+Created probe 1
+xcelium> database -open waves -into waves.shm -default
+Created default SHM database waves
+xcelium> 
